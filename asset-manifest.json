@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/static/css/main.2cb9a270.css",
-    "main.js": "/static/js/main.31e54056.js",
-    "static/media/SS.png": "/static/media/SS.dfefc2388763b3c65d1e.png",
-    "static/media/KK.jpg": "/static/media/KK.9b801b4d7f1d9c09da4a.jpg",
-    "index.html": "/index.html",
-    "main.2cb9a270.css.map": "/static/css/main.2cb9a270.css.map",
-    "main.31e54056.js.map": "/static/js/main.31e54056.js.map"
+    "main.css": "/Orbital25/static/css/main.2cb9a270.css",
+    "main.js": "/Orbital25/static/js/main.d0745611.js",
+    "static/media/SS.png": "/Orbital25/static/media/SS.dfefc2388763b3c65d1e.png",
+    "static/media/KK.jpg": "/Orbital25/static/media/KK.9b801b4d7f1d9c09da4a.jpg",
+    "index.html": "/Orbital25/index.html",
+    "main.2cb9a270.css.map": "/Orbital25/static/css/main.2cb9a270.css.map",
+    "main.d0745611.js.map": "/Orbital25/static/js/main.d0745611.js.map"
   },
   "entrypoints": [
     "static/css/main.2cb9a270.css",
-    "static/js/main.31e54056.js"
+    "static/js/main.d0745611.js"
   ]
 }
