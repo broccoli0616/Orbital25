@@ -1,6 +1,7 @@
 import Header from "./Header";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+//navigates between routes
 
 function GeneratePage() {
   const navigate = useNavigate();
@@ -72,16 +73,35 @@ function GeneratePage() {
   function handleSubmit(e) {
     e.preventDefault();
     console.log(formData);
+    
     if (isSubmitting == false) {
-      fetch("https://a7d5-222-210-137-155.ngrok-free.app/generate", {
+      setIsSubmitting(true);
+      fetch("https://4e9c-220-166-228-198.ngrok-free.app/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        mode: "cors",  
+      //  credentials: "include",
+        headers: { "Content-Type": "application/json" ,
+        "Accept": "application/json",
+       "ngrok-skip-browser-warning": "true" 
+      },
+        // Converting JavaScript → JSON (when sending to server)
         body: JSON.stringify(formData),
+      }) .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json(); 
+       // Converting JSON → JavaScript (when receiving from server)
       })
-        .then((res) => res.json())
-        .then(navigate("/result"));
+      .then(data => {
+        console.log( {data});
+        navigate("/result", { state: { responseData: data } });
+      })
+      .catch(error => {
+        console.error({error});
+        setIsSubmitting(false); 
+      });
     }
-    setIsSubmitting(true);
   }
 
   if (isSubmitting) return;

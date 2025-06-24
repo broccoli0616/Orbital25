@@ -1,32 +1,18 @@
 import Header from "./Header";
 import { useState } from "react";
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+//Accessing passed route state
 
 function ResultPage() {
-  const [mockData, setMockData] = useState([]);
-  // useEffect(() => {
-  //   fetch("https://0237-222-210-137-155.ngrok-free.app/generate", {
-  //     headers: {
-  //       "ngrok-skip-browser-warning": "true",
-  //     },
-  //   })
-  //     .then((response) => response.json())
-  //     .then((data) => setMockData(data));
-  // }, []);
+  const location = useLocation();
+  const [resultData, setResultData] = useState([]); 
 
   useEffect(() => {
-    fetch("https://a7d5-222-210-137-155.ngrok-free.app/generate", {
-      method: "POST", // Your backend only accepts POST
-      headers: {
-        "Content-Type": "application/json",
-        "ngrok-skip-browser-warning": "true",
-        Accept: "application/json", // Force JSON response
-      },
-      body: JSON.stringify({ requestType: "getResults" }), // Add identifier
-    })
-      .then((response) => response.json())
-      .then((data) => setMockData(data));
-  }, []);
+    if (location.state?.responseData) {
+      setResultData(location.state.responseData);
+    }
+  }, [location.state]); // Re-run if location.state changes
 
   const titleStyle = {
     borderWidth: "0px",
@@ -76,7 +62,7 @@ function ResultPage() {
             </tr>
           </thead>
           <tbody>
-            {mockData.map((item) => (
+            {resultData.map((item) => (
               <tr>
                 <td>{item.Items}</td>
                 <td>{item.Stores}</td>
