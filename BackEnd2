@@ -1,1 +1,111 @@
+from openai import OpenAI
+from dotenv import load_dotenv
 
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+import traceback
+import json
+import os
+
+load_dotenv() #加载.env中的环境变量
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY")) #新版的初始化openai（？）
+
+app = Flask(__name__) #允许跨域请求
+CORS(app)
+
+last_request = {} #最新一次请求，用于feedback改进回答
+
+def build_prompt(data, feedback = None):
+    event_type = data.get("type", "") #读取关键字
+    attendees = data.get("attendees", "")
+    budgets = data.get("budgets", "")
+    dietary = data.get("dietary", "")
+    cookingInvolved = data.get("cookingInvolved", False)
+    store = data.get("store", [])
+
+    if feedback != None: #没有feedback的情况就直接输出，有的话就考虑feedback
+        prompt = f"""用户初始购物需求：
+特定场合：{event_type} 
+人数：{attendees} 
+预算(新币)：{budgets}
+饮食偏好：{dietary}
+是否下厨：{"是" if cookingInvolved else "否"}
+偏好的商店：{", ".join(store)}
+
+用户反馈：{feedback}
+
+请根据反馈，优化购物清单，返回格式如下：
+[
+    {{
+        "Items": "某商品名",
+        "Stores": "某商店",
+        "Quantity": 数量,
+        "Prices": 单价（浮点数）,
+        "Total": 总价（浮点数）
+    }},
+    ...
+]
+"""
+    else: #直接输出
+        prompt = f"""你是一个购物助手，请根据以下信息生成购物清单：
+特定场合：{event_type}
+人数：{attendees}
+预算（新币）：{budgets}
+饮食偏好：{dietary}
+是否下厨：{"是" if cookingInvolved else "否"}
+偏好的商店：{", ".join(store)}
+
+返回格式如下：
+[
+    {{
+        "Items": "某商品名",
+        "Stores": "某商店",
+        "Quantity": 数量,
+        "Prices": 单价（浮点数）,
+        "Total": 总价（浮点数）
+    }},
+    ...
+]
+"""
+    return prompt
+
+@app.route("/generate", methods=["POST"]) #？
+
+def generate(): #主函数
+    global last_request
+    try:
+        data = request.get_json()
+        feedback = data.get("feedback")
+
+        if feedback != None:
+            if last_request != None:
+                prompt = build_prompt(last_request, feedback)
+            else:
+                return jsonify({"error": "初始请求为空"}), 400
+            
+        else:
+            last_request = data
+            prompt = build_prompt(data)
+
+        response = client.chat.completions.create(
+            model="gpt-4-turbo",
+            messages = [
+                {"role": "system", "content": "你是一个精通新加坡餐饮市场的购物助手"},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.5,
+            max_tokens=700
+        )
+
+        response_result = response.choices[0].message.content
+        shopping_list = json.loads(response_result) #拿到清单文本
+        return jsonify(shopping_list)
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":
+    app.run(debug=True)
