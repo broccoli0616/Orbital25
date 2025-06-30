@@ -2,31 +2,16 @@ import Header from "./Header";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 //navigates between routes
+import FormValidation from "./FormValidation";
+// no {} for import 
 
 function GeneratePage() {
   const navigate = useNavigate();
+  // ensure the form only submit once to the backend
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const titleStyle = {
-    borderWidth: "0px",
-    position: "absolute",
-    left: "500px",
-    top: "172px",
-    width: "407px",
-    height: "39px",
-    display: "flex",
-    fontFamily: '"Arial-BoldMT", "Arial Bold", "Arial", sans-serif',
-    fontWeight: "700",
-    fontStyle: "normal",
-    fontSize: "34px",
-    color: "#2E86AB",
-    textAlign: "center",
-  };
-
-  const formStyle = {
-    position: "absolute",
-    left: "500px",
-    top: "220px",
-  };
+  // for form validation 
+  const [showInvalid, setShowInvalid] = useState(false);
+  const [missingFields, setMissingFields] = useState([]);
   const [formData, setFormData] = useState({
     // need a colon
     cookingInvolved: false,
@@ -70,13 +55,34 @@ function GeneratePage() {
     setFormData(update);
   }
 
+  function validateForm() {
+    const requiredFields = [
+      { name: 'type', label: 'Event Type' },
+      { name: 'attendees', label: 'Number of Attendees' },
+      { name: 'budgets', label: 'Budget' },
+      { name: 'dietary', label: 'Dietary Requirement' },
+    ];
+    // construct a new array containing data with props name + label 
+  
+    const missing = requiredFields
+      .filter(field => !formData[field.name])
+      .map(field => field.label);
+  // the array containing the label of all missing fields
+    setMissingFields(missing);
+    return missing.length === 0; // there is no missing fields;
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
     console.log(formData);
-    
+    // before fetch data, do validation first, fail - submit will not proceed 
+    if (!validateForm()) {
+      setShowInvalid(true); // Show the pop-up window if validation fails
+      return;
+    } 
     if (isSubmitting == false) {
       setIsSubmitting(true);
-      fetch("https://4e9c-220-166-228-198.ngrok-free.app/generate", {
+      fetch("http://localhost:5002/generate", {
         method: "POST",
         mode: "cors",  
       //  credentials: "include",
@@ -206,8 +212,13 @@ function GeneratePage() {
             )}
           </div>
         </div>
-        <button onClick={handleSubmit}>Generate</button>
+        <button style = {buttonStyle}onClick={handleSubmit}>Generate</button>
       </form>
+      <FormValidation
+      open={showInvalid} 
+      close={() => setShowInvalid(false)} 
+      missingFields={missingFields} 
+    />
     </div>
   );
 }
@@ -219,4 +230,31 @@ export default function Board() {
       <GeneratePage />
     </div>
   );
+}
+
+const titleStyle = {
+  borderWidth: "0px",
+  position: "absolute",
+  left: "500px",
+  top: "100px",
+  width: "407px",
+  height: "39px",
+  display: "flex",
+  fontFamily: '"Arial-BoldMT", "Arial Bold", "Arial", sans-serif',
+  fontWeight: "700",
+  fontStyle: "normal",
+  fontSize: "34px",
+  color: "#2E86AB",
+  textAlign: "center",
+};
+
+const formStyle = {
+  position: "absolute",
+  left: "500px",
+  top: "150px",
+  textAlign: "center"
+};
+
+const buttonStyle = {
+  marginTop: '30px'
 }
