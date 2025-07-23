@@ -82,7 +82,7 @@ function GeneratePage() {
     } 
     if (isSubmitting == false) {
       setIsSubmitting(true);
-      fetch("http://localhost:5002/generate", {
+      fetch("http://localhost:5001/generate", {
         method: "POST",
         mode: "cors",  
       //  credentials: "include",
@@ -224,9 +224,26 @@ function GeneratePage() {
 }
 
 export default function Board() {
+  const navigate = useNavigate();
+   const returnToHomaPage = () => {
+    navigate("/");
+  }
   return (
     <div>
       <Header />
+       <div style={{
+      position: 'absolute',
+      top: '100px',
+      left: '50px',
+      zIndex: 1000
+    }}>
+      <button 
+        onClick={returnToHomaPage}
+        style={submitButtonStyle}
+      >
+       HomePage
+      </button>
+    </div>
       <GeneratePage />
     </div>
   );
@@ -258,3 +275,14 @@ const formStyle = {
 const buttonStyle = {
   marginTop: '30px'
 }
+
+const submitButtonStyle = {
+  padding: '10px 20px',
+  backgroundColor: '#2E86AB',
+  color: 'white',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer',
+  fontSize: '16px',
+  fontWeight: 'bold',
+};

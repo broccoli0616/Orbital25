@@ -14,6 +14,7 @@ export default function Board() {
           {/*must be jsx </> instead of html component*/}
           <Route path="/generate" element={<GeneratePage />} />
           <Route path="/result" element={<ResultPage />} />
+          <Route path="/order" element={<orderPage />} />
         </Routes>
       </Router>
     </div>

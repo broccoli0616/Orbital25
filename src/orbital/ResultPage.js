@@ -3,26 +3,58 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 //Accessing passed route state
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
+import { useNavigate } from "react-router-dom";
+
 
 function ResultPage() {
   const location = useLocation();
-  const [resultData, setResultData] = useState([]); 
+  const [resultData, setResultData] = useState({
+  shoppingList: [],
+  cookingTutorial: null
+});
+
   const [feedbackInput, setFeedbackInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  
+  const orderNow = () => {
+    navigate("/order");
+  }
+   const backToGenerate = () => {
+    navigate("/generate");
+  }
 
   useEffect(() => {
-    if (location.state?.responseData) {  // if not null
-      setResultData(location.state.responseData); // set resultData to the data rendered from previous page
-    }
-  }, [location.state]); // Re-run if location.state changes
+  if (location.state?.responseData) { // if not null
+    setResultData({ // set resultData to the data rendered from previous page
+      shoppingList: location.state.responseData.shoppingList || [],
+      cookingTutorial: location.state.responseData.cookingTutorial || null
+    });
+  }
+}, [location.state]); // Re-run if location.state changes
   
- 
+ const exportToPDF = () => {
+  const content = document.getElementById('shoppingList'); // store DOM element in content
+  html2canvas(content).then(canvas => { //renders the HTML element as a canvas
+    // then() if success, convert canvas content to pdf image 
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4'); // p for protrait
+
+    const imgWidth = 210; // A4 width in mm
+    const imgHeight = canvas.height * imgWidth / canvas.width;
+  
+    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+    pdf.save('shopping-list.pdf'); // triggers browser download
+  });
+};
   function handleFeedbackSubmit(e) {
     e.preventDefault();
     console.log(feedbackInput);
     if (isLoading == false) {
       setIsLoading(true);
-      fetch("http://localhost:5002/feedback", {
+      fetch("http://localhost:5001/generate", {
         method: "POST",
         mode: "cors",  
       //  credentials: "include",
@@ -41,7 +73,10 @@ function ResultPage() {
       })
       .then(data => {
         console.log( {data});
-        setResultData(data);
+       setResultData({
+       shoppingList: data.shoppingList || [],
+       cookingTutorial: data.cookingTutorial || null
+  });
       })
       .catch(error => {
         console.error({error});
@@ -53,6 +88,34 @@ function ResultPage() {
   return (
     <div>
       <Header />
+       <div style={{
+      position: 'absolute',
+      top: '100px',
+      right: '50px',
+      zIndex: 1000
+    }}>
+      <button 
+        onClick={orderNow}
+        style={submitButtonStyle}
+      >
+       Order Now
+      </button>
+    </div>
+      <div style={{
+      position: 'absolute',
+      top: '100px',
+      left: '50px',
+      zIndex: 1000
+    }}>
+      <button 
+        onClick={backToGenerate}
+        style={submitButtonStyle}
+      >
+       Regenerate
+      </button>
+    </div>
+      <div style={pageStyle} > 
+      <div id="shoppingList" >
       <h1 style={titleStyle}>Your Personalized Shopping List</h1> 
       <div style ={constentStyle}>
       <div className="resultTable">
@@ -67,7 +130,7 @@ function ResultPage() {
             </tr>
           </thead>
           <tbody>
-            {resultData.map((item) => (
+            {resultData.shoppingList.map((item) => (
               <tr>
                 <td>{item.Items}</td>
                 <td>{item.Stores}</td>
@@ -80,7 +143,46 @@ function ResultPage() {
           </tbody>
         </table>
       </div>
+
       <div style={feedbackStyle}>
+         <h2 style={feedbackTitleStyle}>Cooking Tutorial:</h2>
+         {resultData.cookingTutorial ? (
+           <div style={{ 
+      whiteSpace: 'pre-line',
+      textAlign: 'left',
+      padding: '10px',
+      backgroundColor: '#f8f8f8',
+      borderRadius: '4px'
+    }}>
+      {resultData.cookingTutorial}
+    </div>
+  )
+        : <div> no cookingTutorial available </div>}
+      </div>
+      </div>
+      <div style={{ 
+  display: 'flex', 
+  justifyContent: 'center', 
+  margin: '20px 0'
+}}>
+  <button 
+    onClick={exportToPDF}
+    style={{
+      padding: '10px 20px',
+      backgroundColor: '#2E86AB', 
+      color: 'white',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer',
+      fontSize: '16px'
+    }}
+  >
+    Export as PDF
+  </button>
+  </div>
+</div>
+
+   <div style={feedbackStyle}>
           <h2 style={feedbackTitleStyle}>Not the ideal list that you are looking for? Type down your customised request:</h2>
           <form onSubmit={handleFeedbackSubmit} style={formStyle}>
             <input
@@ -99,15 +201,16 @@ function ResultPage() {
         </div>
       </div>
     </div>
+
   );
 }
 
 export default ResultPage;
 const titleStyle = {
   borderWidth: "0px",
-  position: "absolute",
-  left: "400px",
-  top: "100px",
+ // position: "absolute",
+ // left: "400px",
+ //top: "100px",
   width: "556px",
   height: "39px",
   display: "flex",
@@ -148,7 +251,7 @@ const feedbackTitleStyle = {
   color: "#2E86AB",
 }
 const constentStyle = {
-  position: 'relative',
+//  position: 'relative',
   left: '400px',
   top: '150px',
 }
@@ -186,3 +289,12 @@ const submitButtonStyle = {
   fontSize: '16px',
   fontWeight: 'bold',
 };
+
+const pageStyle = {
+  padding: '20px',
+  maxWidth: '1200px',
+  margin: '0 auto',  // center the container
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center'  // center child elements
+}
