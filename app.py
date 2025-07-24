@@ -271,5 +271,14 @@ def generate():
 
 application = app
 
+@app.route('/')
+def home():
+    return jsonify({
+        "status": "API is running",
+        "available_endpoint": {
+            "POST /generate": "Generate shopping lists"
+        }
+    })
+
 if __name__ == "__main__":
     app.run(debug=True)
