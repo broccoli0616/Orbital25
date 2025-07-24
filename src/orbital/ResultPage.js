@@ -194,7 +194,7 @@ function ResultPage() {
             />
             <div style={buttonContainerStyle}>
               <button type="submit" style={submitButtonStyle} disabled={isLoading}>
-                {isLoading ? "Processing..." : "Regenerate"}
+                Regenerate
               </button>
             </div>
           </form>
