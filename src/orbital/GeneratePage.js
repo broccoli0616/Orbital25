@@ -82,7 +82,7 @@ function GeneratePage() {
     } 
     if (isSubmitting == false) {
       setIsSubmitting(true);
-      fetch("http://localhost:5001/generate", {
+      fetch("https://shoppinglistatnus.onrender.com/generate", {
         method: "POST",
         mode: "cors",  
       //  credentials: "include",

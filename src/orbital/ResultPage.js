@@ -56,7 +56,7 @@ function ResultPage() {
     console.log(feedbackInput);
     if (isLoading == false) {
       setIsLoading(true);
-      fetch("http://localhost:5001/generate", {
+      fetch("https://shoppinglistatnus.onrender.com/generate", {
         method: "POST",
         mode: "cors",  
       //  credentials: "include",
@@ -204,8 +204,8 @@ function ResultPage() {
               style={inputStyle}
             />
             <div style={buttonContainerStyle}>
-              <button type="submit" style={submitButtonStyle} disabled={isLoading}> {/* button unclickable if isLoading is true */}
-                Regenerate
+              <button type="submit" style={submitButtonStyle} disabled={isLoading}>
+                {isLoading ? "Processing..." : "Regenerate"}
               </button>
             </div>
           </form>
