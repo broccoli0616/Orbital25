@@ -1,4 +1,5 @@
 import Header from "./Header";
+import Loading from "./Loading";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -17,6 +18,7 @@ function ResultPage() {
 
   const [feedbackInput, setFeedbackInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const navigate = useNavigate();
   
   const orderNow = () => {
@@ -80,6 +82,7 @@ function ResultPage() {
       })
       .catch(error => {
         console.error({error});
+      }).finally(() => {
         setIsLoading(false); 
       });
     }
@@ -88,6 +91,14 @@ function ResultPage() {
   return (
     <div>
       <Header />
+      <Loading
+      open={isInitialLoading || isLoading}  
+      message={
+        isInitialLoading 
+          ? "Generating your shopping list... Please wait for a while."
+          : "Processing your feedback... Please wait for a while."
+      }
+    />
        <div style={{
       position: 'absolute',
       top: '100px',
@@ -193,8 +204,8 @@ function ResultPage() {
               style={inputStyle}
             />
             <div style={buttonContainerStyle}>
-              <button type="submit" style={submitButtonStyle} disabled={isLoading}>
-                {isLoading ? "Processing..." : "Regenerate"}
+              <button type="submit" style={submitButtonStyle} disabled={isLoading}> {/* button unclickable if isLoading is true */}
+                Regenerate
               </button>
             </div>
           </form>
