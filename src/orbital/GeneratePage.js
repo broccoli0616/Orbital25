@@ -1,4 +1,5 @@
 import Header from "./Header";
+import Loading from "./Loading";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 //navigates between routes
@@ -110,7 +111,17 @@ function GeneratePage() {
     }
   }
 
-  if (isSubmitting) return;
+// loading indicator
+if (isSubmitting) {
+  return (
+    <div>
+      <Loading 
+        open={true}
+        message="Generating your shopping list... Please wait for a while."
+      />
+    </div>
+  );
+}
 
   return (
     <div>
