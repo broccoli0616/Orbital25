@@ -31,11 +31,11 @@ function ResultPage() {
 
   useEffect(() => {
   if (location.state?.responseData) { // Checks if data exists in the route's state
+    setIsInitialLoading(false);
     setResultData({ // set resultData to the data rendered from previous page
       shoppingList: location.state.responseData.shoppingList || [],
       cookingTutorial: location.state.responseData.cookingTutorial || null
     }); 
-     setIsInitialLoading(false);
   } else {
     setIsInitialLoading(true);
   }
@@ -103,7 +103,7 @@ function ResultPage() {
           : "Processing your feedback... Please wait for a while."
       }
     />
-       <div style={{
+       {/* <div style={{
       position: 'absolute',
       top: '100px',
       right: '50px',
@@ -115,7 +115,7 @@ function ResultPage() {
       >
        Order Now
       </button>
-    </div>
+    </div> */}
       <div style={{
       position: 'absolute',
       top: '100px',
