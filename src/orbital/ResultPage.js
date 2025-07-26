@@ -21,19 +21,23 @@ function ResultPage() {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const navigate = useNavigate();
   
-  const orderNow = () => {
-    navigate("/order");
-  }
+  // const orderNow = () => {
+  //   navigate("/order");
+  // }
+
    const backToGenerate = () => {
     navigate("/generate");
-  }
+  } 
 
   useEffect(() => {
-  if (location.state?.responseData) { // if not null
+  if (location.state?.responseData) { // Checks if data exists in the route's state
     setResultData({ // set resultData to the data rendered from previous page
       shoppingList: location.state.responseData.shoppingList || [],
       cookingTutorial: location.state.responseData.cookingTutorial || null
-    });
+    }); 
+     setIsInitialLoading(false);
+  } else {
+    setIsInitialLoading(true);
   }
 }, [location.state]); // Re-run if location.state changes
   
